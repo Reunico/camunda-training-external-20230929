@@ -1,0 +1,13 @@
+server:
+  port: 8090
+application:
+  login: //
+  password: //
+  lottery-url: https://demo.reunico.com/api/lottery
+  participants-url: https://demo.reunico.com/api/registered-participants
+  numbering-url: https://demo.reunico.com/api/numbering
+  notify-url: https://demo.reunico.com/api/notify-participant
+camunda:
+  bpm:
+    client:
+      base-url: http://localhost:8080/engine-rest

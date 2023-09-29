@@ -1,0 +1,242 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn:definitions xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:camunda="http://camunda.org/schema/1.0/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xmlns:modeler="http://camunda.org/schema/modeler/1.0" id="Definitions_1d1cigb" targetNamespace="http://bpmn.io/schema/bpmn" exporter="Camunda Modeler" exporterVersion="5.14.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.19.0">
+  <bpmn:process id="lottery" name="Лотерея" isExecutable="true" camunda:versionTag="v.4" camunda:historyTimeToLive="180">
+    <bpmn:startEvent id="StartEvent_1" name="Начало лотереи">
+      <bpmn:outgoing>Flow_1smkg8e</bpmn:outgoing>
+    </bpmn:startEvent>
+    <bpmn:sequenceFlow id="Flow_1smkg8e" sourceRef="StartEvent_1" targetRef="Activity_start" />
+    <bpmn:serviceTask id="Activity_start" name="Открыть регистрацию" camunda:type="external" camunda:topic="start">
+      <bpmn:incoming>Flow_1smkg8e</bpmn:incoming>
+      <bpmn:outgoing>Flow_0kcrhkz</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0kcrhkz" sourceRef="Activity_start" targetRef="Event_timer" />
+    <bpmn:intermediateCatchEvent id="Event_timer" name="5 минут">
+      <bpmn:incoming>Flow_0kcrhkz</bpmn:incoming>
+      <bpmn:outgoing>Flow_1t39h4r</bpmn:outgoing>
+      <bpmn:timerEventDefinition id="TimerEventDefinition_1ov06ji">
+        <bpmn:timeDuration xsi:type="bpmn:tFormalExpression">PT15S</bpmn:timeDuration>
+      </bpmn:timerEventDefinition>
+    </bpmn:intermediateCatchEvent>
+    <bpmn:sequenceFlow id="Flow_1t39h4r" sourceRef="Event_timer" targetRef="Activity_stop" />
+    <bpmn:serviceTask id="Activity_stop" name="Остановить регистрацию" camunda:type="external" camunda:topic="stop">
+      <bpmn:incoming>Flow_1t39h4r</bpmn:incoming>
+      <bpmn:outgoing>Flow_0cs8aml</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_0cs8aml" sourceRef="Activity_stop" targetRef="Activity_getParticipants" />
+    <bpmn:serviceTask id="Activity_getParticipants" name="Получить список участников" camunda:type="external" camunda:topic="get-participants">
+      <bpmn:incoming>Flow_0cs8aml</bpmn:incoming>
+      <bpmn:outgoing>Flow_07ug4mn</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:sequenceFlow id="Flow_07ug4mn" sourceRef="Activity_getParticipants" targetRef="Activity_numerateParticipants" />
+    <bpmn:serviceTask id="Activity_numerateParticipants" name="Присвоить номера участникам" camunda:type="external" camunda:topic="numerate-participants">
+      <bpmn:incoming>Flow_07ug4mn</bpmn:incoming>
+      <bpmn:outgoing>Flow_1jqazj7</bpmn:outgoing>
+    </bpmn:serviceTask>
+    <bpmn:subProcess id="Activity_subLottery" name="Для каждого участника">
+      <bpmn:extensionElements>
+        <camunda:inputOutput>
+          <camunda:inputParameter name="prizes" />
+        </camunda:inputOutput>
+      </bpmn:extensionElements>
+      <bpmn:incoming>Flow_1jqazj7</bpmn:incoming>
+      <bpmn:outgoing>Flow_1tbx3jb</bpmn:outgoing>
+      <bpmn:multiInstanceLoopCharacteristics camunda:collection="participants" camunda:elementVariable="participant" />
+      <bpmn:startEvent id="Event_beginLottery" name="Начало розыгрыша">
+        <bpmn:outgoing>Flow_15nyh90</bpmn:outgoing>
+      </bpmn:startEvent>
+      <bpmn:exclusiveGateway id="Gateway_isWin" name="Выигрышный номер?" default="Flow_07emqno">
+        <bpmn:incoming>Flow_0ulf2ht</bpmn:incoming>
+        <bpmn:outgoing>Flow_13vm0kn</bpmn:outgoing>
+        <bpmn:outgoing>Flow_07emqno</bpmn:outgoing>
+      </bpmn:exclusiveGateway>
+      <bpmn:sequenceFlow id="Flow_15nyh90" sourceRef="Event_beginLottery" targetRef="Activity_15wv6kj" />
+      <bpmn:sequenceFlow id="Flow_13vm0kn" name="Да" sourceRef="Gateway_isWin" targetRef="Activity_notifyWin">
+        <bpmn:conditionExpression xsi:type="bpmn:tFormalExpression">${ prizes.size() &gt; 0 }</bpmn:conditionExpression>
+      </bpmn:sequenceFlow>
+      <bpmn:serviceTask id="Activity_notifyWin" name="Поздравить участника" camunda:type="external" camunda:topic="notify">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="chatId">${ participant.chatId }</camunda:inputParameter>
+            <camunda:outputParameter name="text">Здравствуйте ${participant.name}  ! Поздравляем с выигрышем! Вы выиграли:  ${ prizes }</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_13vm0kn</bpmn:incoming>
+        <bpmn:outgoing>Flow_0mr9h28</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="Flow_07emqno" name="Нет" sourceRef="Gateway_isWin" targetRef="Activity_0a7h8q7" />
+      <bpmn:endEvent id="Event_win" name="Участник выиграл">
+        <bpmn:incoming>Flow_0mr9h28</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_0mr9h28" sourceRef="Activity_notifyWin" targetRef="Event_win" />
+      <bpmn:endEvent id="Event_fail" name="Участник не выиграл">
+        <bpmn:incoming>Flow_0uif366</bpmn:incoming>
+      </bpmn:endEvent>
+      <bpmn:sequenceFlow id="Flow_0kz59as" sourceRef="Activity_15wv6kj" targetRef="Activity_0pjhwwe" />
+      <bpmn:businessRuleTask id="Activity_15wv6kj" name="Сверить номера участников" camunda:resultVariable="prizes" camunda:decisionRef="goods" camunda:mapDecisionResult="collectEntries">
+        <bpmn:incoming>Flow_15nyh90</bpmn:incoming>
+        <bpmn:outgoing>Flow_0kz59as</bpmn:outgoing>
+      </bpmn:businessRuleTask>
+      <bpmn:serviceTask id="Activity_0a7h8q7" name="Поблагодарить за участие" camunda:type="external" camunda:topic="notify">
+        <bpmn:extensionElements>
+          <camunda:inputOutput>
+            <camunda:inputParameter name="chatId">${ participant.chatId }</camunda:inputParameter>
+            <camunda:outputParameter name="text">Здравствуйте ${participant.name}  ! Повезет в следующий раз :(</camunda:outputParameter>
+          </camunda:inputOutput>
+        </bpmn:extensionElements>
+        <bpmn:incoming>Flow_07emqno</bpmn:incoming>
+        <bpmn:outgoing>Flow_0uif366</bpmn:outgoing>
+      </bpmn:serviceTask>
+      <bpmn:sequenceFlow id="Flow_0uif366" sourceRef="Activity_0a7h8q7" targetRef="Event_fail" />
+      <bpmn:sequenceFlow id="Flow_0ulf2ht" sourceRef="Activity_0pjhwwe" targetRef="Gateway_isWin" />
+      <bpmn:userTask id="Activity_0pjhwwe" name="Проверить результат">
+        <bpmn:incoming>Flow_0kz59as</bpmn:incoming>
+        <bpmn:outgoing>Flow_0ulf2ht</bpmn:outgoing>
+      </bpmn:userTask>
+    </bpmn:subProcess>
+    <bpmn:sequenceFlow id="Flow_1jqazj7" sourceRef="Activity_numerateParticipants" targetRef="Activity_subLottery" />
+    <bpmn:endEvent id="Event_endLottery" name="Лотерея завершена">
+      <bpmn:incoming>Flow_1tbx3jb</bpmn:incoming>
+    </bpmn:endEvent>
+    <bpmn:sequenceFlow id="Flow_1tbx3jb" sourceRef="Activity_subLottery" targetRef="Event_endLottery" />
+  </bpmn:process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="lottery">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <dc:Bounds x="182" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="158" y="195" width="84" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_15ii3r7_di" bpmnElement="Activity_start">
+        <dc:Bounds x="270" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0udtms7_di" bpmnElement="Event_timer">
+        <dc:Bounds x="432" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="430" y="195" width="40" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1ce2a97_di" bpmnElement="Activity_stop">
+        <dc:Bounds x="530" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0wjqyo3_di" bpmnElement="Activity_getParticipants">
+        <dc:Bounds x="720" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_0lbmrrb_di" bpmnElement="Activity_numerateParticipants">
+        <dc:Bounds x="910" y="130" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_1b6dm9t_di" bpmnElement="Event_endLottery">
+        <dc:Bounds x="2172" y="152" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="2162" y="195" width="57" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1etwczu_di" bpmnElement="Activity_subLottery" isExpanded="true">
+        <dc:Bounds x="1080" y="80" width="840" height="390" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0i3rto1_di" bpmnElement="Event_beginLottery">
+        <dc:Bounds x="1120" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1109" y="205" width="59" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0jyxord_di" bpmnElement="Event_win">
+        <dc:Bounds x="1802" y="162" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1797" y="205" width="47" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Event_0vdpsxi_di" bpmnElement="Event_fail">
+        <dc:Bounds x="1792" y="322" width="36" height="36" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1779" y="365" width="62" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_1rpnfa5_di" bpmnElement="Activity_notifyWin">
+        <dc:Bounds x="1640" y="140" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_0r0nt4r" bpmnElement="Activity_0a7h8q7">
+        <dc:Bounds x="1640" y="300" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Gateway_0bwm2yb_di" bpmnElement="Gateway_isWin" isMarkerVisible="true">
+        <dc:Bounds x="1485" y="155" width="50" height="50" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1475" y="118" width="69" height="27" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_08611uh_di" bpmnElement="Activity_15wv6kj">
+        <dc:Bounds x="1210" y="140" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Activity_17kln91_di" bpmnElement="Activity_0pjhwwe">
+        <dc:Bounds x="1350" y="140" width="100" height="80" />
+        <bpmndi:BPMNLabel />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="Flow_15nyh90_di" bpmnElement="Flow_15nyh90">
+        <di:waypoint x="1156" y="180" />
+        <di:waypoint x="1210" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_13vm0kn_di" bpmnElement="Flow_13vm0kn">
+        <di:waypoint x="1535" y="180" />
+        <di:waypoint x="1640" y="180" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1581" y="162" width="14" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07emqno_di" bpmnElement="Flow_07emqno">
+        <di:waypoint x="1510" y="205" />
+        <di:waypoint x="1510" y="340" />
+        <di:waypoint x="1640" y="340" />
+        <bpmndi:BPMNLabel>
+          <dc:Bounds x="1584" y="313" width="19" height="14" />
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0mr9h28_di" bpmnElement="Flow_0mr9h28">
+        <di:waypoint x="1740" y="180" />
+        <di:waypoint x="1802" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kz59as_di" bpmnElement="Flow_0kz59as">
+        <di:waypoint x="1310" y="180" />
+        <di:waypoint x="1350" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0uif366_di" bpmnElement="Flow_0uif366">
+        <di:waypoint x="1740" y="340" />
+        <di:waypoint x="1792" y="340" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0ulf2ht_di" bpmnElement="Flow_0ulf2ht">
+        <di:waypoint x="1450" y="180" />
+        <di:waypoint x="1485" y="180" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1smkg8e_di" bpmnElement="Flow_1smkg8e">
+        <di:waypoint x="218" y="170" />
+        <di:waypoint x="270" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0kcrhkz_di" bpmnElement="Flow_0kcrhkz">
+        <di:waypoint x="370" y="170" />
+        <di:waypoint x="432" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1t39h4r_di" bpmnElement="Flow_1t39h4r">
+        <di:waypoint x="468" y="170" />
+        <di:waypoint x="530" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_0cs8aml_di" bpmnElement="Flow_0cs8aml">
+        <di:waypoint x="630" y="170" />
+        <di:waypoint x="720" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_07ug4mn_di" bpmnElement="Flow_07ug4mn">
+        <di:waypoint x="820" y="170" />
+        <di:waypoint x="910" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1jqazj7_di" bpmnElement="Flow_1jqazj7">
+        <di:waypoint x="1010" y="170" />
+        <di:waypoint x="1080" y="170" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="Flow_1tbx3jb_di" bpmnElement="Flow_1tbx3jb">
+        <di:waypoint x="1920" y="170" />
+        <di:waypoint x="2172" y="170" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn:definitions>

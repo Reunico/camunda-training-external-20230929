@@ -1,0 +1,94 @@
+#  Валидация плана миграции
+
+POST {{url}}/engine-rest/migration/validate
+Content-Type: application/json
+
+{
+  "sourceProcessDefinitionId": "lottery:3:1d60b8aa-5eba-11ee-806e-86cdca40a59f",
+  "targetProcessDefinitionId": "lottery:4:ead353fb-5eba-11ee-806e-86cdca40a59f",
+  "instructions": [
+    {
+      "sourceActivityIds": [
+        "Activity_notifyWin"
+      ],
+      "targetActivityIds": [
+        "Activity_notifyWin"
+      ],
+      "updateEventTrigger": false
+    },
+    {
+      "sourceActivityIds": [
+        "Activity_0a7h8q7"
+      ],
+      "targetActivityIds": [
+        "Activity_0a7h8q7"
+      ],
+      "updateEventTrigger": false
+    },
+    {
+      "sourceActivityIds": [
+        "Activity_stop"
+      ],
+      "targetActivityIds": [
+        "Activity_stop"
+      ],
+      "updateEventTrigger": false
+    },
+    {
+      "sourceActivityIds": [
+        "Activity_numerateParticipants"
+      ],
+      "targetActivityIds": [
+        "Activity_numerateParticipants"
+      ],
+      "updateEventTrigger": false
+    },
+    {
+      "sourceActivityIds": [
+        "Activity_getParticipants"
+      ],
+      "targetActivityIds": [
+        "Activity_getParticipants"
+      ],
+      "updateEventTrigger": false
+    },
+    {
+      "sourceActivityIds": [
+        "Activity_subLottery#multiInstanceBody"
+      ],
+      "targetActivityIds": [
+        "Activity_subLottery#multiInstanceBody"
+      ],
+      "updateEventTrigger": false
+    },
+    {
+      "sourceActivityIds": [
+        "Activity_subLottery"
+      ],
+      "targetActivityIds": [
+        "Activity_subLottery"
+      ],
+      "updateEventTrigger": false
+    },
+    {
+      "sourceActivityIds": [
+        "Activity_start"
+      ],
+      "targetActivityIds": [
+        "Activity_start"
+      ],
+      "updateEventTrigger": false
+    },
+    {
+      "sourceActivityIds": [
+        "Event_timer"
+      ],
+      "targetActivityIds": [
+        "Event_timer"
+      ],
+      "updateEventTrigger": false
+    }
+  ],
+  "variables": null
+}
+

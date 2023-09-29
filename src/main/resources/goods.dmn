@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="https://www.omg.org/spec/DMN/20191111/MODEL/" xmlns:dmndi="https://www.omg.org/spec/DMN/20191111/DMNDI/" xmlns:dc="http://www.omg.org/spec/DMN/20180521/DC/" xmlns:modeler="http://camunda.org/schema/modeler/1.0" xmlns:camunda="http://camunda.org/schema/1.0/dmn" id="Definitions_0xlg8td" name="DRD" namespace="http://camunda.org/schema/1.0/dmn" exporter="Camunda Modeler" exporterVersion="5.14.0" modeler:executionPlatform="Camunda Platform" modeler:executionPlatformVersion="7.19.0">
+  <decision id="goods" name="Список сувениров">
+    <decisionTable id="DecisionTable_013lu83" hitPolicy="COLLECT">
+      <input id="Input_1" label="Participant Number" camunda:inputVariable="number">
+        <inputExpression id="InputExpression_1" typeRef="long">
+          <text>participant.number</text>
+        </inputExpression>
+      </input>
+      <input id="InputClause_1flesr6" label="Name" camunda:inputVariable="name">
+        <inputExpression id="LiteralExpression_0ax2x5a" typeRef="string">
+          <text>participant.name</text>
+        </inputExpression>
+      </input>
+      <output id="Output_1" label="Prize" name="prize" typeRef="string" />
+      <rule id="DecisionRule_16ap1cg">
+        <inputEntry id="UnaryTests_0mhvxib">
+          <text>1</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_0dze4pr">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1ncyyi6">
+          <text>"Футболка XXL"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_0l4a93g">
+        <inputEntry id="UnaryTests_19opmc1">
+          <text>2</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1rbumj1">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0dvcnxh">
+          <text>"Футболка XL"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_03bq3wm">
+        <inputEntry id="UnaryTests_12jnywf">
+          <text>[1..10]</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1fovfn5">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1nuz2fj">
+          <text>"Ручка"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1wncrd1">
+        <inputEntry id="UnaryTests_1yg5jxt">
+          <text>[1..10]</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1fq50fn">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_08d7mik">
+          <text>"Блокнот"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_19uqm8w">
+        <inputEntry id="UnaryTests_1g60uu7">
+          <text>[1..10]</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_011l79s">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_1ywb6r8">
+          <text>"Наклейки"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_1snypsu">
+        <inputEntry id="UnaryTests_0pxtsqv">
+          <text>3</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1yy62qb">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0xnk953">
+          <text>"Футболка L"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_11t824s">
+        <inputEntry id="UnaryTests_0v2cxbz">
+          <text>4,5</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1668uz7">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0bjq1ty">
+          <text>"Бандана"</text>
+        </outputEntry>
+      </rule>
+      <rule id="DecisionRule_13nbyni">
+        <inputEntry id="UnaryTests_1ip3cft">
+          <text>6,7</text>
+        </inputEntry>
+        <inputEntry id="UnaryTests_1sk9453">
+          <text></text>
+        </inputEntry>
+        <outputEntry id="LiteralExpression_0e71ia2">
+          <text>"Носки"</text>
+        </outputEntry>
+      </rule>
+    </decisionTable>
+  </decision>
+  <dmndi:DMNDI>
+    <dmndi:DMNDiagram>
+      <dmndi:DMNShape dmnElementRef="goods">
+        <dc:Bounds height="80" width="180" x="160" y="80" />
+      </dmndi:DMNShape>
+    </dmndi:DMNDiagram>
+  </dmndi:DMNDI>
+</definitions>

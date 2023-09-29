@@ -1,0 +1,35 @@
+### Отбор, блокировка и завершение задачи Остановить регистрацию
+
+GET {{url}}/engine-rest/external-task?processInstanceId={{processInstanceId}}&topic-name=stop
+
+###
+
+POST {{url}}/engine-rest/external-task/fetchAndLock
+Content-Type: application/json
+
+{
+  "workerId": "test",
+  "maxTasks": 1,
+  "topics": [
+    {
+      "topicName":  "stop",
+      "lockDuration": 10000
+    }
+  ]
+}
+
+> {%
+
+ client.global.set("taskId", response.body[0].id)
+
+ %}
+
+
+###
+
+POST {{url}}/engine-rest/external-task/{{taskId}}/complete
+Content-Type: application/json
+
+{
+  "workerId": "test"
+}

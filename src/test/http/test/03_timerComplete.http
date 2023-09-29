@@ -1,0 +1,17 @@
+### Отбор и завершение таймера
+
+GET {{url}}/engine-rest/job?processInstanceId={{processInstanceId}}&timers=true
+
+> {%
+
+ client.global.set("jobId", response.body[0].id)
+
+ %}
+
+
+###
+
+POST {{url}}/engine-rest/job/{{jobId}}/execute
+Content-Type: application/json
+
+{}

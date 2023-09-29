@@ -1,0 +1,18 @@
+### Подготовка плана миграции
+
+POST {{url}}/engine-rest/migration/generate
+Content-Type: application/json
+
+{
+  "sourceProcessDefinitionId": "lottery:3:1d60b8aa-5eba-11ee-806e-86cdca40a59f",
+  "targetProcessDefinitionId": "lottery:4:ead353fb-5eba-11ee-806e-86cdca40a59f"
+}
+
+> {%
+
+ client.global.set("sourceProcessDefinitionId", response.body.sourceProcessDefinitionId)
+ client.global.set("targetProcessDefinitionId", response.body.targetProcessDefinitionId)
+ client.global.set("instructions", response.body.instructions)
+
+
+ %}

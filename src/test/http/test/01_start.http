@@ -1,0 +1,12 @@
+### Старт процесса Проведение лотереи
+
+POST {{url}}/engine-rest/process-definition/key/{{lotteryKey}}/start
+Content-Type: application/json
+
+{}
+
+> {%
+
+ client.global.set("processInstanceId", response.body.id)
+
+ %}
